@@ -1,0 +1,33 @@
+---
+- name: Create arr folder
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/arr"
+    state: directory
+
+- name: Copy env file
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ deploy_path }}/arr/.env"
+
+- name: Copy compose file
+  ansible.builtin.template:
+    src: compose.yml
+    dest: "{{ deploy_path }}/arr/compose.yml"
+
+# Avoids an occasional error where some containers fail to connect to
+# the gluetun container if it was updated/restarted
+- name: Down arr stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/arr"
+    state: absent
+  become: true
+
+- name: Start arr stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/arr"
+  become: true
+  register: arr_output
+
+- name: Show results
+  ansible.builtin.debug:
+    var: arr_output
