@@ -1,0 +1,20 @@
+---
+- name: Create portainer folder
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/portainer"
+    state: directory
+
+- name: Copy compose file
+  ansible.builtin.template:
+    src: compose.yml
+    dest: "{{ deploy_path }}/portainer/compose.yml"
+
+- name: Start portainer
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/portainer"
+  become: true
+  register: portainer_output
+
+- name: Show results
+  ansible.builtin.debug:
+    var: portainer_output
