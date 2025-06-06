@@ -8,5 +8,5 @@ Ansible playbook for (crudely) configuring machines in my homelab.
 
 ### Usage
 
-After cloning run scripts/git-init.sh to configure a pre-commit hook to
-hopefully avoid committing secrets!
+After cloning run `scripts/git-init.sh` or `just init` to configure a pre-commit
+hook to hopefully avoid committing secrets!
