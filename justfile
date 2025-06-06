@@ -9,6 +9,10 @@ init:
     chmod +x .git/hooks/pre-commit
   fi
 
+  # Run playbook
+run:
+  ansible-playbook run.yml
+
 # just vault (encrypt/decrypt/edit/view)
 vault ACTION:
   ansible-vault {{ACTION}} group_vars/secrets.yml
