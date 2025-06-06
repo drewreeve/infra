@@ -1,0 +1,35 @@
+services:
+  plex:
+    image: linuxserver/plex:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      proxy:
+    ports:
+      - 32400:32400/tcp
+    volumes:
+      - config:/config
+      - media:/data
+      - /dev/shm:/transcode
+    devices:
+      - /dev/dri:/dev/dri
+    environment:
+      VERSION: "docker"
+      ADVERTISE_IP: "https://plex.{{ domain }}:443"
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.plex.loadbalancer.server.port: "32400"
+      traefik.http.routers.plex.rule: "Host(`plex.{{ domain }}`) || Host(`plex.{{ inventory_hostname }}.{{ domain }}`)"
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  config:
+  media:
+    driver_opts:
+      type: nfs
+      o: "addr=argon,nfsvers=4,async"
+      device: ":/volume1/video"

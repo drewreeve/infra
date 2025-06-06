@@ -1,0 +1,20 @@
+---
+- name: Create plex folder
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/plex"
+    state: directory
+
+- name: Copy compose file
+  ansible.builtin.template:
+    src: compose.yml
+    dest: "{{ deploy_path }}/plex/compose.yml"
+
+- name: Start plex
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/plex"
+  become: true
+  register: plex_output
+
+- name: Show results
+  ansible.builtin.debug:
+    var: plex_output
