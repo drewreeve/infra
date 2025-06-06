@@ -1,0 +1,26 @@
+---
+- name: Create adguard_sync_folders
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/adguard_sync/conf"
+    state: directory
+
+- name: Copy adguard_sync config
+  ansible.builtin.template:
+    src: adguardhome-sync.yml.j2
+    dest: "{{ deploy_path }}/adguard_sync/conf/adguardhome-sync.yaml"
+  register: adguardsync_config
+
+- name: Copy adguard_sync compose
+  ansible.builtin.copy:
+    src: compose.yml
+    dest: "{{ deploy_path }}/adguard_sync/compose.yml"
+
+- name: Start AdguardSync
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/adguard_sync"
+  become: true
+  register: output
+
+- name: Show results
+  ansible.builtin.debug:
+    var: output

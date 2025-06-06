@@ -1,0 +1,12 @@
+services:
+  adguardhome-sync:
+    image: lscr.io/linuxserver/adguardhome-sync:latest
+    container_name: adguardhome-sync
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ./conf:/config
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped

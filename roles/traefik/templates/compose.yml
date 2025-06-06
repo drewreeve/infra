@@ -1,0 +1,38 @@
+secrets:
+  cf-token:
+    file: ./cf-token
+
+services:
+  traefik:
+    image: traefik:v3.4
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      CF_DNS_API_TOKEN_FILE: ${CF_DNS_API_TOKEN_FILE}
+    networks:
+      proxy:
+    ports:
+      - "80:80"
+      - "443:443"
+    secrets:
+      - cf-token
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - "{{ deploy_path }}/traefik/data/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - letsencrypt_data:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`{{ inventory_hostname }}.{{ domain}}`)"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.middlewares.admin-auth.basicauth.users=${DASHBOARD_CREDENTIALS}"
+      - "traefik.http.routers.traefik-dashboard.middlewares=admin-auth@docker"
+
+networks:
+  proxy:
+    external: true
+volumes:
+  letsencrypt_data:

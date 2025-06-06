@@ -1,0 +1,42 @@
+---
+- name: Create proxy network
+  community.docker.docker_network:
+    name: proxy
+    state: present
+  become: true
+
+- name: Create traefik folders
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/traefik/data"
+    state: directory
+
+- name: Copy files
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop: "{{ traefik_files }}"
+  vars:
+    traefik_files:
+      - src: compose.yml
+        dest: "{{ deploy_path }}/traefik/compose.yml"
+      - src: env.j2
+        dest: "{{ deploy_path }}/traefik/.env"
+      - src: cf-token.j2
+        dest: "{{ deploy_path }}/traefik/cf-token"
+
+- name: Copy traefik.yml
+  ansible.builtin.template:
+    src: traefik.yml.j2
+    dest: "{{ deploy_path }}/traefik/data/traefik.yml"
+  register: traefik_config
+
+- name: Start traefik
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/traefik"
+    recreate: "{{ 'always' if traefik_config.changed else 'auto' }}"
+  become: true
+  register: traefik_output
+
+- name: Show results
+  ansible.builtin.debug:
+    var: traefik_output

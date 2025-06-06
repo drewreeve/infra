@@ -1,0 +1,64 @@
+---
+
+- name: Free port 53 for adguard
+  become: true
+  when: ansible_distribution == 'Ubuntu'
+  block:
+    - name: Create systemd/resolved.conf.d folder
+      ansible.builtin.file:
+        path: /etc/systemd/resolved.conf.d
+        state: directory
+        mode: "0755"
+
+    - name: Disable dns stub listener
+      ansible.builtin.copy:
+        content: |
+          [Resolve]
+          DNS=127.0.0.1
+          DNSStubListener=no
+        dest: /etc/systemd/resolved.conf.d/adguardhome.conf
+        mode: "0644"
+      register: disable_stub
+
+    - name: Fix symlink so dns still works
+      ansible.builtin.file:
+        src: ../run/systemd/resolve/resolv.conf
+        path: /etc/resolv.conf
+        state: link
+      register: resolv_symlink
+
+    - name: Restart systemd-resolved
+      when: disable_stub.changed or resolv_symlink.changed
+      ansible.builtin.service:
+        name: systemd-resolved
+        state: restarted
+
+- name: Create adguard folders
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/adguard/conf"
+    state: directory
+
+# TODO: Configure using adguard API instead of copying config
+- name: Copy adguard config
+  ansible.builtin.template:
+    force: false
+    src: AdGuardHome.yaml.j2
+    dest: "{{ deploy_path }}/adguard/conf/AdGuardHome.yaml"
+  become: true
+  register: adguard_config
+
+- name: Copy adguard compose file
+  ansible.builtin.template:
+    src: compose.yml
+    dest: "{{ deploy_path }}/adguard/compose.yml"
+
+- name: Start adguard
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/adguard"
+    recreate: "{{ 'always' if adguard_config.changed else 'auto' }}"
+  become: true
+  register: adguard_output
+
+- name: Show results
+  ansible.builtin.debug:
+    var: adguard_output
