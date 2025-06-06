@@ -1,0 +1,13 @@
+---
+homelab:
+  children:
+    pi:
+      hosts:
+        cherrypi:
+      vars:
+        ansible_user: "pi"
+    vm:
+      hosts:
+        loki:
+      vars:
+        ansible_user: "ubuntu"
