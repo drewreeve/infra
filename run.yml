@@ -1,0 +1,38 @@
+---
+- name: Setup Loki
+  hosts: loki
+  vars_files:
+    - "group_vars/secrets.yml"
+  roles:
+    - role: docker
+      become: true
+    - role: traefik
+      tags: traefik
+    - role: adguard
+      tags: adguard
+    - role: adguard_sync
+      tags: adguard
+    - role: plex
+      tags: plex
+    - role: arr
+      tags: arr
+    - role: portainer
+      tags: portainer
+    - role: uptime_kuma
+      tags: uptime_kuma
+    - role: karakeep
+      tags: karakeep
+
+- name: Setup Cherrypi
+  hosts: cherrypi
+  vars_files:
+    - "group_vars/secrets.yml"
+  roles:
+    - role: docker
+      become: true
+    - role: traefik
+      tags: traefik
+    - role: adguard
+      tags: adguard
+    - role: portainer
+      tags: portainer
