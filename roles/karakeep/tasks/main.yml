@@ -1,0 +1,33 @@
+# A self-hostable bookmark-everything app (links, notes and images)
+# with AI-based automatic tagging and full text search
+#
+# https://karakeep.app
+
+- name: Create karakeep folder
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/karakeep"
+    state: directory
+    mode: '0755'
+
+- name: Copy files
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: '0644'
+  loop: "{{ karakeep_files }}"
+  vars:
+    karakeep_files:
+      - src: compose.yml
+        dest: "{{ deploy_path }}/karakeep/compose.yml"
+      - src: env
+        dest: "{{ deploy_path }}/karakeep/.env"
+
+- name: Start karakeep
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/karakeep"
+  become: true
+  register: karakeep_output
+
+- name: Show results
+  ansible.builtin.debug:
+    var: karakeep_output
