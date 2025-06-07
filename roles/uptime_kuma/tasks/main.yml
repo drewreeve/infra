@@ -3,11 +3,13 @@
   ansible.builtin.file:
     path: "{{ deploy_path }}/uptime-kuma/data"
     state: directory
+    mode: '0755'
 
 - name: Copy compose file
   ansible.builtin.template:
     src: compose.yml
     dest: "{{ deploy_path }}/uptime-kuma/compose.yml"
+    mode: '0644'
 
 - name: Start uptime-kuma
   community.docker.docker_compose_v2:

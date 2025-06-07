@@ -3,11 +3,13 @@
   ansible.builtin.file:
     path: "{{ deploy_path }}/komodo"
     state: directory
+    mode: '0755'
 
 - name: Copy files
   ansible.builtin.template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
+    mode: '0644'
   loop: "{{ komodo_files }}"
   vars:
     komodo_files:
@@ -25,4 +27,3 @@
 - name: Show results
   ansible.builtin.debug:
     var: komodo_output
-

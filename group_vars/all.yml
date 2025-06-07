@@ -1,1 +1,1 @@
-deploy_path: "/home/{{ ansible_user}}/docker"
+deploy_path: "/home/{{ ansible_user }}/docker"

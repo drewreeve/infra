@@ -8,7 +8,7 @@
       ansible.builtin.file:
         path: /etc/systemd/resolved.conf.d
         state: directory
-        mode: "0755"
+        mode: '0755'
 
     - name: Disable dns stub listener
       ansible.builtin.copy:
@@ -17,7 +17,7 @@
           DNS=127.0.0.1
           DNSStubListener=no
         dest: /etc/systemd/resolved.conf.d/adguardhome.conf
-        mode: "0644"
+        mode: '0644'
       register: disable_stub
 
     - name: Fix symlink so dns still works
@@ -37,6 +37,7 @@
   ansible.builtin.file:
     path: "{{ deploy_path }}/adguard/conf"
     state: directory
+    mode: '0755'
 
 # TODO: Configure using adguard API instead of copying config
 - name: Copy adguard config
@@ -44,6 +45,7 @@
     force: false
     src: AdGuardHome.yaml.j2
     dest: "{{ deploy_path }}/adguard/conf/AdGuardHome.yaml"
+    mode: '0644'
   become: true
   register: adguard_config
 
@@ -51,6 +53,7 @@
   ansible.builtin.template:
     src: compose.yml
     dest: "{{ deploy_path }}/adguard/compose.yml"
+    mode: '0644'
 
 - name: Start adguard
   community.docker.docker_compose_v2:

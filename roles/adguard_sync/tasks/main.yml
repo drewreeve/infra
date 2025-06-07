@@ -3,17 +3,20 @@
   ansible.builtin.file:
     path: "{{ deploy_path }}/adguard_sync/conf"
     state: directory
+    mode: '0755'
 
 - name: Copy adguard_sync config
   ansible.builtin.template:
     src: adguardhome-sync.yml.j2
     dest: "{{ deploy_path }}/adguard_sync/conf/adguardhome-sync.yaml"
+    mode: '0644'
   register: adguardsync_config
 
 - name: Copy adguard_sync compose
   ansible.builtin.copy:
     src: compose.yml
     dest: "{{ deploy_path }}/adguard_sync/compose.yml"
+    mode: '0644'
 
 - name: Start AdguardSync
   community.docker.docker_compose_v2:
