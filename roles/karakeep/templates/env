@@ -2,9 +2,9 @@ DATA_DIR=/data
 BROWSER_WEB_URL=http://chrome:9222
 MEILI_ADDR=http://meilisearch:7700
 MEILI_NO_ANALYTICS=true
-MEILI_MASTER_KEY="{{ lookup('community.general.random_string', length=36, base64=True) }}"
+MEILI_MASTER_KEY="{{ karakeep.meili_master_key }}"
 NEXTAUTH_URL="https://karakeep.{{ inventory_hostname }}.{{ domain }}"
-NEXTAUTH_SECRET="{{ lookup('community.general.random_string', length=36, base64=True) }}"
+NEXTAUTH_SECRET="{{ karakeep.nextauth_secret }}"
 OPENAI_BASE_URL="{{ gemini.openai_url }}"
 OPENAI_API_KEY="{{ gemini.api_key }}"
 INFERENCE_TEXT_MODEL=gemini-2.0-flash
