@@ -1,5 +1,9 @@
 #!/usr/bin/env -S just --justfile
 
+# List available tasks
+default:
+    just --list
+
 # Setup pre-commit hook to ensure secrets.yml is encrypted
 init:
   #!/usr/bin/env bash
@@ -9,7 +13,7 @@ init:
     chmod +x .git/hooks/pre-commit
   fi
 
-  # Run playbook
+# Run playbook
 run:
   ansible-playbook run.yml
 
