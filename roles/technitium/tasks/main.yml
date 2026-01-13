@@ -1,0 +1,27 @@
+---
+
+# - name: Disable systemd resolved DNS stubbing
+#   ansible.builtin.import_role:
+#     name: util
+#     tasks_from: disable_systemdresolved
+
+- name: Create technitium folder
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/technitium"
+    state: directory
+    mode: '0755'
+
+- name: Copy technitium compose file
+  ansible.builtin.template:
+    src: compose.yml
+    dest: "{{ deploy_path }}/technitium/compose.yml"
+    mode: '0644'
+
+- name: Start technitium
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/technitium"
+  become: true
+  register: technitium_output
+
+- name: Configure technitium
+  ansible.builtin.import_tasks: ./configure.yml
