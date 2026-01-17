@@ -13,7 +13,7 @@ services:
     environment:
       #The primary domain name used by this DNS Server to identify itself.
       - DNS_SERVER_DOMAIN={{ dns_url }}
-      - DNS_SERVER_ADMIN_PASSWORD={{ adguard.password }}
+      - DNS_SERVER_ADMIN_PASSWORD={{ dns.technitium.password }}
     volumes:
       - ./config:/etc/dns
     restart: unless-stopped
