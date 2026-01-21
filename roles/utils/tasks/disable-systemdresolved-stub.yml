@@ -1,7 +1,7 @@
 ---
 - name: Disable stub listener on port 53
   become: true
-  when: ansible_distribution == 'Ubuntu'
+  when: ansible_facts['distribution'] == 'Ubuntu'
   block:
     - name: Create systemd/resolved.conf.d folder
       ansible.builtin.file:
