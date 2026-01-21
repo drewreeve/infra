@@ -5,6 +5,7 @@ Ansible playbook for (crudely) configuring machines in my homelab.
 ### Requirements
 
 * Needs passlib for adguard role
+* Run `just reqs` to install additional roles/collections
 
 ### Usage
 
