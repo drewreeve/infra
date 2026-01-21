@@ -1,1 +1,37 @@
 ---
+
+- name: Login and get primary session token
+  effectivelywild.technitium_dns.technitium_dns_login:
+    api_url: "http://localhost"
+    username: "{{ dns.technitium.user }}"
+    password: "{{ dns.technitium.password }}"
+  register: primary_login_response
+
+- name: Create forwarded zones
+  effectivelywild.technitium_dns.technitium_dns_zone:
+    api_url: "http://localhost"
+    api_token: "{{ primary_login_response.token }}"
+    catalog: "cluster-catalog.test.arpa"
+    dnssecValidation: "{{ item.value.dnssecValidation }}"
+    zone: "{{ item.value.zone }}"
+    type: "{{ item.value.type }}"
+    forwarder: "{{ item.value.forwarder }}"
+    initializeForwarder: "{{ item.value.initializeForwarder }}"
+    protocol: Udp
+    state: present
+  loop: "{{ dns.technitium.zones.forward | dict2items }}"
+
+- name: Add whitelisted domains
+  effectivelywild.technitium_dns.technitium_dns_add_allowed_zone:
+    api_url: "http://localhost"
+    api_token: "{{ primary_login_response.token }}"
+    domain: "{{ item }}"
+  loop: "{{ dns.technitium.allowedDomains }}"
+
+- name: Enable forwarders and blocklists
+  effectivelywild.technitium_dns.technitium_dns_set_server_settings:
+    api_url: "http://localhost"
+    api_token: "{{ primary_login_response.token }}"
+    blockListUrls: "{{ dns.technitium.block_lists }}"
+    forwarders: "{{ dns.technitium.forwarders.addresses }}"
+    forwarderProtocol: "{{ dns.technitium.forwarders.protocol }}"

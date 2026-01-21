@@ -13,6 +13,9 @@ init:
     chmod +x .git/hooks/pre-commit
   fi
 
+dns:
+  ansible-playbook dns.yml
+
 # Run playbook
 run:
   ansible-playbook run.yml

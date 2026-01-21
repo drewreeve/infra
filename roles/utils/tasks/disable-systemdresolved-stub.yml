@@ -1,0 +1,32 @@
+---
+- name: Disable stub listener on port 53
+  become: true
+  when: ansible_distribution == 'Ubuntu'
+  block:
+    - name: Create systemd/resolved.conf.d folder
+      ansible.builtin.file:
+        path: /etc/systemd/resolved.conf.d
+        state: directory
+        mode: "0755"
+
+    - name: Disable dns stub listener
+      ansible.builtin.copy:
+        content: |
+          [Resolve]
+          DNSStubListener=no
+        dest: /etc/systemd/resolved.conf.d/no-stub.conf
+        mode: "0644"
+      register: disable_stub
+
+    - name: Fix symlink so dns still works
+      ansible.builtin.file:
+        src: ../run/systemd/resolve/resolv.conf
+        path: /etc/resolv.conf
+        state: link
+      register: resolv_symlink
+
+    - name: Restart systemd-resolved
+      when: disable_stub.changed or resolv_symlink.changed
+      ansible.builtin.service:
+        name: systemd-resolved
+        state: restarted

@@ -1,0 +1,45 @@
+---
+# Setup technitium DNS
+
+- name: Install docker/traefik
+  hosts: dns
+  vars_files:
+    - "group_vars/secrets.yml"
+  roles:
+    - role: docker
+      become: true
+      tags: docker
+    - role: traefik
+      tags: traefik
+
+# Install technitium prior to configuration
+- name: Install technitium
+  hosts: dns
+  vars_files:
+    - "group_vars/secrets.yml"
+  roles:
+    - role: technitium
+      tags: technitium
+
+# Configure technitium
+- name: Configure technitium
+  hosts: dns
+  vars_files:
+    - "group_vars/secrets.yml"
+  tasks:
+    - name: Initialize cluster
+      ansible.builtin.include_role:
+        name: technitium
+        tasks_from: cluster.yml
+        apply:
+          tags: technitium
+      tags: technitium
+
+    - name: Configure cluster
+      include_role:
+        name: technitium
+        tasks_from: configure.yml
+        apply:
+          tags: technitium
+      when: inventory_hostname == 'loki'
+      tags: technitium

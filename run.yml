@@ -8,12 +8,6 @@
       become: true
     - role: traefik
       tags: traefik
-    # - role: adguard
-    #   tags: adguard
-    # - role: adguard_sync
-    #   tags: adguard
-    - role: technitium
-      tags: technitium
     - role: plex
       tags: plex
     - role: arr
@@ -34,9 +28,5 @@
       become: true
     - role: traefik
       tags: traefik
-    - role: technitium
-      tags: technitium
-    # - role: adguard
-    #   tags: adguard
     - role: portainer
       tags: portainer

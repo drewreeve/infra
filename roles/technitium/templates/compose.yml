@@ -6,8 +6,8 @@ services:
     networks:
       proxy:
     ports:
-      # - "5380:5380/tcp" #DNS web console (HTTP)
-      - "53443:53443/tcp" #DNS web console (HTTPS), needed for clustering
+      - "127.0.0.1:5380:5380/tcp" #DNS web console (HTTP)
+      - "53443:53443/tcp" #DNS web console (HTTPS), exposed for clustering
       - "53:53/udp" #DNS service
       - "53:53/tcp" #DNS service
     environment:

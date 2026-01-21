@@ -1,9 +1,9 @@
 ---
 
-# - name: Disable systemd resolved DNS stubbing
-#   ansible.builtin.import_role:
-#     name: util
-#     tasks_from: disable_systemdresolved
+- name: Disable systemd resolved stub listener
+  ansible.builtin.import_role:
+    name: utils
+    tasks_from: disable-systemdresolved-stub.yml
 
 - name: Create technitium folder
   ansible.builtin.file:
@@ -22,6 +22,3 @@
     project_src: "{{ deploy_path }}/technitium"
   become: true
   register: technitium_output
-
-- name: Configure technitium
-  ansible.builtin.import_tasks: ./configure.yml
