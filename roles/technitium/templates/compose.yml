@@ -23,6 +23,12 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.technitium.loadbalancer.server.port=5380"
       - "traefik.http.routers.technitium.rule=Host(`{{ dns_url }}`)"
+    healthcheck:
+      test: ["CMD-SHELL", "dig +short +retry=0 +norecurse @127.0.0.1 SOA localhost || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 networks:
   proxy:
