@@ -13,12 +13,12 @@ init:
     chmod +x .git/hooks/pre-commit
   fi
 
-dns:
-  ansible-playbook dns.yml
+dns args='':
+  ansible-playbook dns.yml {{args}}
 
 # Run playbook
-run:
-  ansible-playbook run.yml
+run args='':
+  ansible-playbook run.yml {{args}}
 
 # just vault (encrypt/decrypt/edit/view)
 vault ACTION:
