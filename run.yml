@@ -1,8 +1,6 @@
 ---
 - name: Setup Loki
   hosts: loki
-  vars_files:
-    - "group_vars/secrets.yml"
   roles:
     - role: docker
       become: true
@@ -21,8 +19,6 @@
 
 - name: Setup Cherrypi
   hosts: cherrypi
-  vars_files:
-    - "group_vars/secrets.yml"
   roles:
     - role: docker
       become: true
