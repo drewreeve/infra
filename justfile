@@ -22,7 +22,7 @@ run args='':
 
 # just vault (encrypt/decrypt/edit/view)
 vault ACTION:
-  ansible-vault {{ACTION}} group_vars/secrets.yml
+  ansible-vault {{ACTION}} group_vars/all/secrets.yml
 
 # optionally use --force to force reinstall all requirements
 reqs *FORCE:

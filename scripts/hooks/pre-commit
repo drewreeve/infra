@@ -4,20 +4,20 @@
 # Place this file at .git/hooks/pre-commit and make it executable
 
 # Check if group_vars/secrets.yml is being committed
-if git diff --cached --name-only | grep -q "^group_vars/secrets\.yml$"; then
-  echo "Checking if group_vars/secrets.yml is encrypted..."
+if git diff --cached --name-only | grep -q "^group_vars/all/secrets\.yml$"; then
+  echo "Checking if group_vars/all/secrets.yml is encrypted..."
 
   # Check if secrets.yml contains the Ansible Vault header
-  if ! grep -q "^\$ANSIBLE_VAULT;" group_vars/secrets.yml; then
-    echo "❌ ERROR: group_vars/secrets.yml is not encrypted!"
+  if ! grep -q "^\$ANSIBLE_VAULT;" group_vars/all/secrets.yml; then
+    echo "❌ ERROR: group_vars/all/secrets.yml is not encrypted!"
     echo ""
     echo "Please encrypt it with:"
-    echo "  ansible-vault encrypt group_vars/secrets.yml"
+    echo "  ansible-vault encrypt group_vars/all/secrets.yml"
     echo ""
     echo "Or use --no-verify to bypass this check (not recommended)"
     exit 1
   else
-    echo "✅ group_vars/secrets.yml is properly encrypted"
+    echo "✅ group_vars/all/secrets.yml is properly encrypted"
   fi
 fi
 
