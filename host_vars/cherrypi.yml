@@ -1,1 +1,2 @@
 dns_url: "dns2.{{ domain }}"
+docker_monitoring: true
