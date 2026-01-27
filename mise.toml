@@ -1,0 +1,19 @@
+[tasks.deploy]
+run = "ansible-playbook run.yml"
+
+[tasks.dns]
+run = "ansible-playbook dns.yml"
+
+[tasks.vault]
+description = "Vault management"
+usage = '''
+arg "<action>" help="Vault action" {
+  choices "encrypt" "decrypt" "edit" "view"
+}
+'''
+run = '''
+ansible-vault "${usage_action?}" group_vars/all/secrets.yml
+'''
+
+[tasks.reqs]
+run = "ansible-galaxy install -r requirements.yml"
