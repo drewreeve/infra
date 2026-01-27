@@ -16,6 +16,8 @@
       tags: uptime_kuma
     - role: karakeep
       tags: karakeep
+    - role: paperless
+      tags: paperless
 
 - name: Setup Cherrypi
   hosts: cherrypi

@@ -1,0 +1,46 @@
+services:
+  broker:
+    image: docker.io/library/redis:8
+    restart: unless-stopped
+    networks:
+      default:
+    volumes:
+      - ./redisdata:/data
+  db:
+    image: docker.io/library/postgres:18
+    restart: unless-stopped
+    networks:
+      default:
+    volumes:
+      - ./pgdata:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: {{ paperless.db.user }}
+      POSTGRES_PASSWORD: {{ paperless.db.password }}
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    networks:
+      default:
+      proxy:
+    env_file: .env
+    depends_on:
+      - db
+      - broker
+    volumes:
+      - ./data:/usr/src/paperless/data
+      - ./media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.paperless.rule=Host(`paperless.{{ domain }}`)
+      - traefik.http.services.paperless.loadbalancer.server.port=8000
+
+networks:
+  proxy:
+    external: true
