@@ -1,0 +1,23 @@
+---
+- name: Create pricebuddy folder
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/pricebuddy"
+    state: directory
+    mode: '0755'
+
+- name: Create .env file
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ deploy_path }}/pricebuddy/.env"
+    mode: '0644'
+
+- name: Copy compose file
+  ansible.builtin.template:
+    src: compose.yml
+    dest: "{{ deploy_path }}/pricebuddy"
+    mode: '0644'
+
+- name: Start pricebuddy
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/pricebuddy"
+  become: true

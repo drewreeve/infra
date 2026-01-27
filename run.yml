@@ -18,6 +18,8 @@
       tags: karakeep
     - role: paperless
       tags: paperless
+    - role: pricebuddy
+      tags: pricebuddy
 
 - name: Setup Cherrypi
   hosts: cherrypi

@@ -1,0 +1,59 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php.dockerfile
+    image: jez500/pricebuddy:latest
+    volumes:
+      - ./data:/app/storage
+      - ./.env:/app/.env
+    environment:
+      APP_URL: "https://pricebuddy.{{ domain }}"
+      ASSET_URL: "https://pricebuddy.{{ domain }}"
+      DB_HOST: database # Name of the database service
+      DB_USERNAME: "{{ pricebuddy.mysql.user }}" # Should match the MYSQL_USER in the database service
+      DB_PASSWORD: "{{ pricebuddy.mysql.password }}" # Should match the MYSQL_PASSWORD in the database service
+      DB_DATABASE: pricebuddy                 # Should match the MYSQL_DATABASE in the database service
+      APP_USER_EMAIL: "{{ pricebuddy.app_user.email }}"       # Only used for seeding the database
+      APP_USER_PASSWORD: "{{ pricebuddy.app_user.password }}" # Only used for seeding the database
+      SCRAPER_BASE_URL: http://scraper:3000   # Url to Name of the scrapper service
+      AFFILIATE_ENABLED: 'true'               # See https://pricebuddy.jez.me/support-project.html
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - default
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.pricebuddy.rule=Host(`pricebuddy.{{ domain }}`)
+      - traefik.http.services.pricebuddy.loadbalancer.server.port=80
+
+  database:
+    image: mysql:8.2
+    environment:
+      MYSQL_DATABASE: pricebuddy
+      MYSQL_USER: "{{ pricebuddy.mysql.user }}"
+      MYSQL_PASSWORD: "{{ pricebuddy.mysql.password }}"
+      MYSQL_ROOT_PASSWORD: "{{ pricebuddy.mysql.root_password }}"
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      - default
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 1m
+
+  scraper:
+    image: jez500/seleniumbase-scrapper:latest
+    networks:
+      - default
+
+networks:
+  default:
+  proxy:
+    external: true
