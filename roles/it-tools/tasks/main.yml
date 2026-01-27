@@ -1,0 +1,17 @@
+---
+- name: Create it-tools folder
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/it-tools/data"
+    state: directory
+    mode: '0755'
+
+- name: Copy compose file
+  ansible.builtin.template:
+    src: compose.yml
+    dest: "{{ deploy_path }}/it-tools/compose.yml"
+    mode: '0644'
+
+- name: Start it-tools
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/it-tools"
+  become: true

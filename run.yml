@@ -30,3 +30,5 @@
       tags: traefik
     - role: dockhand
       tags: dockhand
+    - role: it-tools
+      tags: it-tools
