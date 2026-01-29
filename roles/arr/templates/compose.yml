@@ -36,6 +36,10 @@ services:
       traefik.http.services.radarr.loadbalancer.server.port: "7878"
       traefik.http.routers.radarr.rule: "Host(`radarr.{{ domain }}`) || Host(`radarr.{{ inventory_hostname }}.{{ domain }}`)"
       traefik.http.routers.radarr.service: "radarr"
+      # cleanuparr
+      traefik.http.services.cleanuparr.loadbalancer.server.port: "11011"
+      traefik.http.routers.cleanuparr.rule: "Host(`cleanuparr.{{ inventory_hostname }}.{{ domain }}`)"
+      traefik.http.routers.cleanuparr.service: "cleanuparr"
 
   qbittorrent:
     depends_on:
@@ -116,16 +120,43 @@ services:
 
 
   flaresolverr:
-      depends_on:
-        gluetun:
-          condition: service_healthy
-          restart: true
-      image: flaresolverr/flaresolverr:latest
-      container_name: flaresolverr
-      network_mode: "service:gluetun"
-      security_opt:
-        - no-new-privileges:true
-      restart: unless-stopped
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    image: flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    network_mode: "service:gluetun"
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  cleanuparr:
+    image: ghcr.io/cleanuparr/cleanuparr:latest
+    container_name: cleanuparr
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./cleanuparr_config:/config
+      # Mount your downloads directory if needed
+      - qbittorrent_downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
+    # Health check configuration
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11011/health"]
+      interval: 30s        # Check every 30 seconds
+      timeout: 10s         # Allow up to 10 seconds for response
+      start_period: 30s    # Wait 30 seconds before first check
+      retries: 3           # Mark unhealthy after 3 consecutive failures
 
 networks:
   gluetun:
