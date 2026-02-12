@@ -13,17 +13,18 @@ init:
     chmod +x .git/hooks/pre-commit
   fi
 
-dns args='':
+dns *args:
   ansible-playbook dns.yml {{args}}
 
 # Run playbook
-run args='':
+run *args:
   ansible-playbook run.yml {{args}}
-
-# just vault (encrypt/decrypt/edit/view)
-vault ACTION:
-  ansible-vault {{ACTION}} group_vars/all/secrets.yml
 
 # optionally use --force to force reinstall all requirements
 reqs *FORCE:
 	ansible-galaxy install -r requirements.yml {{FORCE}}
+
+# just vault (encrypt/decrypt/edit/view)
+[arg('ACTION', pattern='encrypt|decrypt|edit|view')]
+vault ACTION:
+  ansible-vault {{ACTION}} group_vars/all/secrets.yml

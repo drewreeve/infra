@@ -17,3 +17,13 @@ ansible-vault "${usage_action?}" group_vars/all/secrets.yml
 
 [tasks.reqs]
 run = "ansible-galaxy install -r requirements.yml"
+
+[tasks.init]
+run = '''
+#!/usr/bin/env bash
+if [ -d .git/ ]; then
+  rm .git/hooks/pre-commit
+  cp -v scripts/hooks/pre-commit .git/hooks/pre-commit
+  chmod +x .git/hooks/pre-commit
+fi
+'''
