@@ -1,3 +1,6 @@
+[env]
+_.file = '.env'
+
 [tasks.deploy]
 run = "ansible-playbook run.yml"
 
@@ -13,6 +16,12 @@ arg "<action>" help="Vault action" {
 '''
 run = '''
 ansible-vault "${usage_action?}" group_vars/all/secrets.yml
+'''
+
+[tasks.vault-check]
+description = "Verify vault password configuration without running a playbook"
+run = '''
+ansible-vault view group_vars/all/secrets.yml > /dev/null
 '''
 
 [tasks.reqs]
