@@ -1,7 +1,14 @@
+log:
+  level: WARNING
+
 providers:
   docker:
     watch: true
     exposedByDefault: false
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
 entryPoints:
   web:
     address: ":80"
@@ -14,13 +21,16 @@ entryPoints:
   websecure:
     address: ":443"
     http:
+      middlewares:
+        - secure-headers@file
       tls:
         certResolver: cloudflare
+        options: modern@file
         domains:
           - main: "{{ domain }}"
             sans: ["*.{{ domain }}"]
-          - main: "{{ inventory_hostname}}.{{ domain }}"
-            sans: ["*.{{ inventory_hostname}}.{{ domain }}"]
+          - main: "{{ inventory_hostname }}.{{ domain }}"
+            sans: ["*.{{ inventory_hostname }}.{{ domain }}"]
 
 api:
   dashboard: true

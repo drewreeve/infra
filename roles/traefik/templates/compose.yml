@@ -22,6 +22,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - "{{ deploy_path }}/traefik/data/traefik.yml:/etc/traefik/traefik.yml:ro"
       - letsencrypt_data:/letsencrypt
+      - "{{ deploy_path }}/traefik/dynamic:/etc/traefik/dynamic:ro"
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - "traefik.enable=true"
