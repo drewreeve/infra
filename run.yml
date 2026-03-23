@@ -4,6 +4,7 @@
   roles:
     - role: docker
       become: true
+      tags: docker
     - role: traefik
       tags: traefik
     - role: plex
@@ -26,6 +27,7 @@
   roles:
     - role: docker
       become: true
+      tags: docker
     - role: traefik
       tags: traefik
     - role: dockhand
