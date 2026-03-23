@@ -16,6 +16,7 @@
     src: compose.yml
     dest: "{{ deploy_path }}/arr/compose.yml"
     mode: '0644'
+  register: arr_compose
 
 # Avoids an occasional error where some containers fail to connect to
 # the gluetun container if it was updated/restarted
@@ -24,6 +25,7 @@
     project_src: "{{ deploy_path }}/arr"
     state: absent
   become: true
+  when: arr_compose.changed
 
 - name: Start arr stack
   community.docker.docker_compose_v2:
