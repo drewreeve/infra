@@ -30,7 +30,7 @@
       tags: technitium
 
     - name: Configure cluster
-      include_role:
+      ansible.builtin.include_role:
         name: technitium
         tasks_from: configure.yml
         apply:
