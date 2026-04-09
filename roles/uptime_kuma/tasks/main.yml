@@ -7,7 +7,7 @@
 
 - name: Copy compose file
   ansible.builtin.template:
-    src: compose.yml
+    src: compose.yml.j2
     dest: "{{ deploy_path }}/uptime-kuma/compose.yml"
     mode: '0644'
 

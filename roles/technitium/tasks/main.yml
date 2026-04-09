@@ -13,7 +13,7 @@
 
 - name: Copy technitium compose file
   ansible.builtin.template:
-    src: compose.yml
+    src: compose.yml.j2
     dest: "{{ deploy_path }}/technitium/compose.yml"
     mode: '0644'
 

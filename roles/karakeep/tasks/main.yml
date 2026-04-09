@@ -17,7 +17,7 @@
   loop: "{{ karakeep_files }}"
   vars:
     karakeep_files:
-      - src: compose.yml
+      - src: compose.yml.j2
         dest: "{{ deploy_path }}/karakeep/compose.yml"
       - src: env
         dest: "{{ deploy_path }}/karakeep/.env"
