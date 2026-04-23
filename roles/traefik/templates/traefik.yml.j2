@@ -20,9 +20,11 @@ entryPoints:
 
   websecure:
     address: ":443"
+    http3: {}
     http:
       middlewares:
         - secure-headers@file
+        - compress@file
       tls:
         certResolver: cloudflare
         options: modern@file

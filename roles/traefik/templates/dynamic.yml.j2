@@ -1,5 +1,12 @@
 http:
   middlewares:
+    compress:
+      compress:
+        encodings:
+          - zstd
+          - br
+          - gzip
+
     secure-headers:
       headers:
         stsSeconds: 31536000
