@@ -9,7 +9,7 @@
   ansible.builtin.template:
     src: compose.yml.j2
     dest: "{{ deploy_path }}/plex/compose.yml"
-    mode: '0644'
+    mode: '0600'
 
 - name: Start plex
   community.docker.docker_compose_v2:
