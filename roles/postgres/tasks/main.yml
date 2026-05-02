@@ -1,0 +1,17 @@
+---
+- name: Create postgres directory
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/postgres"
+    state: directory
+    mode: "0755"
+
+- name: Template postgres compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ deploy_path }}/postgres/compose.yml"
+    mode: "0600"
+
+- name: Start postgres
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/postgres"
+  become: true

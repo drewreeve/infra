@@ -1,24 +1,29 @@
 #!/usr/bin/env bash
 
-# Git pre-commit hook to ensure secrets.yml is encrypted
+# Git pre-commit hook to ensure secrets.yml files are encrypted
 # Place this file at .git/hooks/pre-commit and make it executable
 
-# Check if group_vars/secrets.yml is being committed
-if git diff --cached --name-only | grep -q "^group_vars/all/secrets\.yml$"; then
-  echo "Checking if group_vars/all/secrets.yml is encrypted..."
-
-  # Check if secrets.yml contains the Ansible Vault header
-  if ! grep -q "^\$ANSIBLE_VAULT;" group_vars/all/secrets.yml; then
-    echo "❌ ERROR: group_vars/all/secrets.yml is not encrypted!"
+check_encrypted() {
+  local file="$1"
+  echo "Checking if ${file} is encrypted..."
+  if ! grep -q "^\$ANSIBLE_VAULT;" "${file}"; then
+    echo "❌ ERROR: ${file} is not encrypted!"
     echo ""
     echo "Please encrypt it with:"
-    echo "  ansible-vault encrypt group_vars/all/secrets.yml"
+    echo "  ansible-vault encrypt ${file}"
     echo ""
     echo "Or use --no-verify to bypass this check (not recommended)"
-    exit 1
+    return 1
   else
-    echo "✅ group_vars/all/secrets.yml is properly encrypted"
+    echo "✅ ${file} is properly encrypted"
+    return 0
   fi
-fi
+}
 
-exit 0
+failed=0
+
+for secrets_file in $(git diff --cached --name-only | grep "secrets\.yml$"); do
+  [[ -f "${secrets_file}" ]] && { check_encrypted "${secrets_file}" || failed=1; }
+done
+
+exit ${failed}

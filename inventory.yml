@@ -7,6 +7,7 @@ all:
     loki:
       ansible_user: "ubuntu"
       ansible_host: "10.23.1.20"
+    neon:
   children:
     dns:
       hosts:
