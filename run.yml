@@ -43,5 +43,9 @@
         ansible_become_password: "{{ ansible_become_password }}"
       no_log: true
   roles:
+    - role: traefik
+      tags: traefik
     - role: postgres
       tags: postgres
+    - role: forgejo
+      tags: forgejo

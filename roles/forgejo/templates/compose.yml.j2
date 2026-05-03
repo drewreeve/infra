@@ -1,0 +1,25 @@
+services:
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:15
+    restart: unless-stopped
+    volumes:
+      - ./data:/data
+    env_file:
+      - .env
+    ports:
+      - "2222:22"
+    networks:
+      proxy:
+      postgres:
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "proxy"
+      traefik.http.routers.forgejo.rule: "Host(`git.{{ domain }}`)"
+      traefik.http.services.forgejo.loadbalancer.server.port: "3000"
+
+networks:
+  proxy:
+    external: true
+  postgres:
+    external: true
+    name: postgres

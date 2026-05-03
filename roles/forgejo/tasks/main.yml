@@ -1,0 +1,20 @@
+---
+- name: Create forgejo folder
+  ansible.builtin.file:
+    path: "{{ deploy_path }}/forgejo"
+    state: directory
+    mode: "0755"
+
+- name: Copy files
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "0600"
+  loop:
+    - { src: compose.yml.j2, dest: "{{ deploy_path }}/forgejo/compose.yml" }
+    - { src: env.j2, dest: "{{ deploy_path }}/forgejo/.env" }
+
+- name: Start forgejo
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/forgejo"
+  become: true

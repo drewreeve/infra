@@ -1,4 +1,10 @@
 ---
+- name: Install psycopg2
+  ansible.builtin.apt:
+    name: python3-psycopg2
+    state: present
+  become: true
+
 - name: Create postgres directory
   ansible.builtin.file:
     path: "{{ deploy_path }}/postgres"
@@ -15,6 +21,12 @@
   community.docker.docker_compose_v2:
     project_src: "{{ deploy_path }}/postgres"
   become: true
+
+- name: Wait for postgres to be ready
+  ansible.builtin.wait_for:
+    host: "{{ postgres_host }}"
+    port: 5432
+    timeout: 30
 
 - name: Manage additional databases and users
   ansible.builtin.include_tasks: databases.yml
