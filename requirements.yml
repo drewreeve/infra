@@ -1,3 +1,4 @@
 ---
 collections:
   - name: effectivelywild.technitium_dns
+  - name: community.postgresql

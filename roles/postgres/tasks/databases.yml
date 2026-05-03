@@ -1,0 +1,35 @@
+---
+- module_defaults:
+    group/community.postgresql.all:
+      login_host: "{{ postgres_host }}"
+      login_user: "{{ postgres.user }}"
+      login_password: "{{ postgres.password }}"
+  block:
+    - name: Create postgres databases
+      community.postgresql.postgresql_db:
+        name: "{{ item.name }}"
+      loop: "{{ postgres_databases }}"
+
+    - name: Create postgres users
+      community.postgresql.postgresql_user:
+        name: "{{ item.user }}"
+        password: "{{ item.password }}"
+      loop: "{{ postgres_databases }}"
+      no_log: true
+
+    - name: Grant database privileges to users
+      community.postgresql.postgresql_privs:
+        database: "{{ item.name }}"
+        roles: "{{ item.user }}"
+        type: database
+        privs: ALL
+      loop: "{{ postgres_databases }}"
+
+    - name: Grant schema privileges to users
+      community.postgresql.postgresql_privs:
+        database: "{{ item.name }}"
+        roles: "{{ item.user }}"
+        type: schema
+        objs: public
+        privs: ALL
+      loop: "{{ postgres_databases }}"
