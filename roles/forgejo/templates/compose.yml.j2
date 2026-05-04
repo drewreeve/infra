@@ -1,6 +1,7 @@
 services:
   forgejo:
     image: codeberg.org/forgejo/forgejo:15
+    container_name: forgejo
     restart: unless-stopped
     volumes:
       - ./data:/data
@@ -11,11 +12,38 @@ services:
     networks:
       proxy:
       postgres:
+      forgejo:
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     labels:
       traefik.enable: "true"
       traefik.docker.network: "proxy"
       traefik.http.routers.forgejo.rule: "Host(`git.{{ domain }}`)"
       traefik.http.services.forgejo.loadbalancer.server.port: "3000"
+
+  docker-in-docker:
+    image: docker:dind
+    restart: unless-stopped
+    privileged: true
+    command: dockerd -H tcp://0.0.0.0:2375 --tls=false
+    networks:
+      - forgejo
+
+  forgejo-runner:
+    image: data.forgejo.org/forgejo/runner:12
+    restart: unless-stopped
+    depends_on:
+      - forgejo
+      - docker-in-docker
+    volumes:
+      - ./runner-data:/data
+    command: forgejo-runner daemon --config /data/config.yml
+    networks:
+      - forgejo
 
 networks:
   proxy:
@@ -23,3 +51,5 @@ networks:
   postgres:
     external: true
     name: postgres
+  forgejo:
+    name: forgejo

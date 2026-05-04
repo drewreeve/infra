@@ -1,20 +1,75 @@
 ---
-- name: Create forgejo folder
+- name: Create forgejo directories
   ansible.builtin.file:
-    path: "{{ deploy_path }}/forgejo"
+    path: "{{ item }}"
     state: directory
     mode: "0755"
+  loop:
+    - "{{ deploy_path }}/forgejo"
+    - "{{ deploy_path }}/forgejo/runner-data"
 
-- name: Copy files
+- name: Copy compose and env files
   ansible.builtin.template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     mode: "0600"
   loop:
     - { src: compose.yml.j2, dest: "{{ deploy_path }}/forgejo/compose.yml" }
-    - { src: env.j2, dest: "{{ deploy_path }}/forgejo/.env" }
+    - { src: env.j2,         dest: "{{ deploy_path }}/forgejo/.env" }
 
-- name: Start forgejo
+- name: Start forgejo service
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/forgejo"
+    services:
+      - forgejo
+  become: true
+
+- name: Wait for forgejo to be healthy
+  community.docker.docker_container_info:
+    name: forgejo
+  register: container_info
+  until: container_info.container.State.Health.Status | default('') == 'healthy'
+  retries: 18
+  delay: 10
+  become: true
+
+- name: Check if runner is already registered
+  ansible.builtin.stat:
+    path: "{{ deploy_path }}/forgejo/runner-data/config.yml"
+  register: runner_config_stat
+
+- name: Register runner and write config
+  when: not runner_config_stat.stat.exists
+  block:
+    - name: Register runner with forgejo
+      community.docker.docker_container_exec:
+        container: forgejo
+        user: git
+        command: >
+          forgejo forgejo-cli actions register
+            --name runner
+            --scope ""
+            --secret {{ forgejo.runner.secret }}
+      register: register_result
+      become: true
+      changed_when: false
+
+    - name: Set runner UUID fact
+      ansible.builtin.set_fact:
+        runner_uuid: "{{ register_result.stdout | regex_search('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}') }}"
+
+    - name: Assert runner UUID was captured
+      ansible.builtin.assert:
+        that: runner_uuid is not none and runner_uuid | length == 36
+        fail_msg: "Failed to extract UUID from registration output: {{ register_result.stdout }}"
+
+    - name: Copy runner config file
+      ansible.builtin.template:
+        src: runner-config.yml.j2
+        dest: "{{ deploy_path }}/forgejo/runner-data/config.yml"
+        mode: "0600"
+
+- name: Start all services
   community.docker.docker_compose_v2:
     project_src: "{{ deploy_path }}/forgejo"
   become: true
