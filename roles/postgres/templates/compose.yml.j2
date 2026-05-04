@@ -3,6 +3,12 @@ services:
     image: postgres:18
     container_name: postgres
     restart: unless-stopped
+    command: >
+      postgres
+      -c shared_buffers=128MB
+      -c effective_cache_size=256MB
+      -c work_mem=4MB
+      -c max_connections=40
     environment:
       POSTGRES_DB: "{{ postgres.db }}"
       POSTGRES_USER: "{{ postgres.user }}"
@@ -13,6 +19,11 @@ services:
       - ./data:/var/lib/postgresql
     networks:
       - postgres
+    shm_size: 128m
+    deploy:
+      resources:
+        limits:
+          memory: 512m
 
 networks:
   postgres:
