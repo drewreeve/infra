@@ -37,11 +37,6 @@
 
 - name: Setup Neon
   hosts: neon
-  pre_tasks:
-    - name: Fetch become password
-      ansible.builtin.set_fact:
-        ansible_become_password: "{{ ansible_become_password }}"
-      no_log: true
   roles:
     - role: traefik
       tags: traefik
