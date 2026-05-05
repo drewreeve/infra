@@ -19,7 +19,7 @@
 
     - name: Grant database privileges to users
       community.postgresql.postgresql_privs:
-        database: "{{ item.name }}"
+        login_db: "{{ item.name }}"
         roles: "{{ item.user }}"
         type: database
         privs: ALL
@@ -27,7 +27,7 @@
 
     - name: Grant schema privileges to users
       community.postgresql.postgresql_privs:
-        database: "{{ item.name }}"
+        login_db: "{{ item.name }}"
         roles: "{{ item.user }}"
         type: schema
         objs: public
