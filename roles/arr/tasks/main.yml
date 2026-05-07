@@ -3,19 +3,67 @@
   ansible.builtin.file:
     path: "{{ deploy_path }}/arr"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Copy env file
   ansible.builtin.template:
     src: env.j2
     dest: "{{ deploy_path }}/arr/.env"
-    mode: '0600'
+    mode: "0600"
+
+- name: Install cifs-utils
+  ansible.builtin.apt:
+    name: cifs-utils
+    state: present
+  become: true
+
+- name: Create /etc/samba directory
+  ansible.builtin.file:
+    path: /etc/samba
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: Copy CIFS credentials file
+  ansible.builtin.template:
+    src: smb-credentials.j2
+    dest: /etc/samba/arr-credentials
+    owner: root
+    group: root
+    mode: "0600"
+  become: true
+  no_log: true
+
+- name: Create CIFS mount point directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - /mnt/arr
+    - /mnt/arr/movies
+    - /mnt/arr/tv
+  become: true
+
+- name: Mount CIFS shares via fstab
+  ansible.builtin.mount:
+    src: "{{ item.src }}"
+    path: "{{ item.path }}"
+    fstype: cifs
+    opts: "credentials=/etc/samba/arr-credentials,vers=3.0,uid=1000,gid=1000,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30"
+    state: mounted
+  loop:
+    - { src: "//argon/video/Movies", path: /mnt/arr/movies }
+    - { src: "//argon/video/TV", path: /mnt/arr/tv }
+  become: true
 
 - name: Copy compose file
   ansible.builtin.template:
     src: compose.yml.j2
     dest: "{{ deploy_path }}/arr/compose.yml"
-    mode: '0600'
+    mode: "0600"
   register: arr_compose
 
 # Avoids an occasional error where some containers fail to connect to

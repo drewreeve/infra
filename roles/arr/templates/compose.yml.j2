@@ -97,7 +97,7 @@ services:
     volumes:
       - sonarr_config:/config
       - qbittorrent_downloads:/downloads
-      - sonarr_media:/tv
+      - /mnt/arr/tv:/tv
 
 
   radarr:
@@ -116,7 +116,7 @@ services:
     volumes:
       - radarr_config:/config
       - qbittorrent_downloads:/downloads
-      - radarr_media:/movies
+      - /mnt/arr/movies:/movies
 
 
   flaresolverr:
@@ -177,17 +177,5 @@ volumes:
       device: ":/volume1/downloads"
   radarr_config:
     name: radarr_config
-  radarr_media:
-    name: radarr_media
-    driver_opts:
-      type: cifs
-      o: "addr=argon,username={{ shares.media.user }},password={{ shares.media.password }},vers=3.0,uid=1000,gid=1000"
-      device: "//argon/video/Movies"
   sonarr_config:
     name: sonarr_config
-  sonarr_media:
-    name: sonarr_media
-    driver_opts:
-      type: cifs
-      o: "addr=argon,username={{ shares.media.user }},password={{ shares.media.password }},vers=3.0,uid=1000,gid=1000"
-      device: "//argon/video/TV"
