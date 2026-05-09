@@ -1,5 +1,6 @@
 ---
-- module_defaults:
+- name: Manage postgres databases and users
+  module_defaults:
     group/community.postgresql.all:
       login_host: "{{ postgres_host }}"
       login_user: "{{ postgres.user }}"

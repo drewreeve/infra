@@ -1,0 +1,16 @@
+---
+# Avoids an occasional error where some containers fail to connect to
+# the gluetun container if it was updated/restarted
+
+- name: Down arr stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/arr"
+    state: absent
+  become: true
+  listen: Restart arr stack
+
+- name: Start arr stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ deploy_path }}/arr"
+  become: true
+  listen: Restart arr stack

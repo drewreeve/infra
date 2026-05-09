@@ -16,17 +16,17 @@
           DNSStubListener=no
         dest: /etc/systemd/resolved.conf.d/no-stub.conf
         mode: "0644"
-      register: disable_stub
+      register: utils_disable_stub
 
     - name: Fix symlink so dns still works
       ansible.builtin.file:
         src: ../run/systemd/resolve/resolv.conf
         path: /etc/resolv.conf
         state: link
-      register: resolv_symlink
+      register: utils_resolv_symlink
 
     - name: Restart systemd-resolved
-      when: disable_stub.changed or resolv_symlink.changed
+      when: utils_disable_stub.changed or utils_resolv_symlink.changed
       ansible.builtin.service:
         name: systemd-resolved
         state: restarted

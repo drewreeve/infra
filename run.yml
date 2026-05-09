@@ -32,8 +32,8 @@
       tags: traefik
     - role: dockhand
       tags: dockhand
-    - role: it-tools
-      tags: it-tools
+    - role: it_tools
+      tags: it_tools
 
 - name: Setup Neon
   hosts: neon

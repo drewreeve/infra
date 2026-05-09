@@ -10,6 +10,7 @@
     src: env.j2
     dest: "{{ deploy_path }}/arr/.env"
     mode: "0600"
+  notify: Restart arr stack
 
 - name: Install cifs-utils
   ansible.builtin.apt:
@@ -64,16 +65,7 @@
     src: compose.yml.j2
     dest: "{{ deploy_path }}/arr/compose.yml"
     mode: "0600"
-  register: arr_compose
-
-# Avoids an occasional error where some containers fail to connect to
-# the gluetun container if it was updated/restarted
-- name: Down arr stack
-  community.docker.docker_compose_v2:
-    project_src: "{{ deploy_path }}/arr"
-    state: absent
-  become: true
-  when: arr_compose.changed
+  notify: Restart arr stack
 
 - name: Start arr stack
   community.docker.docker_compose_v2:
