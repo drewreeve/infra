@@ -1,0 +1,10 @@
+---
+- name: Setup Neon
+  hosts: neon
+  roles:
+    - role: traefik
+      tags: traefik
+    - role: postgres
+      tags: postgres
+    - role: forgejo
+      tags: forgejo

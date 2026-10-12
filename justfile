@@ -16,9 +16,13 @@ init:
 dns *args:
   ansible-playbook dns.yml {{args}}
 
-# Run playbook
+# Run homelab playbook (loki, cherrypi)
 run *args:
   ansible-playbook run.yml {{args}}
+
+# Run neon playbook
+neon *args:
+  ansible-playbook neon.yml {{args}}
 
 # optionally use --force to force reinstall all requirements
 reqs *FORCE:

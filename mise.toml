@@ -4,6 +4,9 @@ _.file = '.env'
 [tasks.deploy]
 run = "ansible-playbook run.yml"
 
+[tasks.neon]
+run = "ansible-playbook neon.yml"
+
 [tasks.dns]
 run = "ansible-playbook dns.yml"
 
