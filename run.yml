@@ -7,18 +7,18 @@
       tags: docker
     - role: traefik
       tags: traefik
-    - role: plex
-      tags: plex
-    - role: arr
-      tags: arr
+    # - role: plex
+    #   tags: plex
+    # - role: arr
+    #   tags: arr
     - role: dockhand
       tags: dockhand
-    - role: uptime_kuma
-      tags: uptime_kuma
+    # - role: uptime_kuma
+    #   tags: uptime_kuma
     - role: karakeep
       tags: karakeep
-    - role: paperless
-      tags: paperless
+    # - role: paperless
+    #   tags: paperless
     - role: pricebuddy
       tags: pricebuddy
 
